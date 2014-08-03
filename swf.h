@@ -9,14 +9,17 @@
 
 #include <fstream>
 #include <memory>
+#include <map>
 
 #include "util.h"
 
 #include "structures.h"
+#include "tags.h"
 
 namespace swf
 {
   std::vector<uint8_t> decompress(std::string);
+  std::string get_tag_name(uint32_t tag);
 
   struct SWFHeader
   {
@@ -70,6 +73,11 @@ namespace swf
       return m_framecount;
     }
 
+    inline uint32_t size()
+    {
+      return 12 + m_framesize->length();
+    }
+
     friend std::ostream& operator<<(std::ostream& os, SWFHeader& header)
     {
       std::cout << "Signature:   " << header.signature() << std::endl;
@@ -104,6 +112,16 @@ namespace swf
       }
 
       m_header = std::make_shared<SWFHeader>(m_content);
+
+      for (uint32_t i = m_header->size(); i < m_content.size();)
+      {
+        Tag newtag(m_content, i);
+        m_tags.push_back(newtag);
+
+        std::cout << "Tag: " << get_tag_name(newtag.tag()) << std::endl;
+        i += newtag.size();
+
+      }
     }
 
     inline SWFHeader header()
@@ -124,6 +142,7 @@ namespace swf
   private:
     std::vector<uint8_t> m_content;
     std::shared_ptr<SWFHeader> m_header;
+    std::vector<Tag> m_tags;
   };
 }
 

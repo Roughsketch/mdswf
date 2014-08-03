@@ -1,3 +1,6 @@
+#ifndef _MDSWF_STRUCTURES_H
+#define _MDSWF_STRUCTURES_H
+
 #include <vector>
 #include <cstdint>
 
@@ -43,6 +46,11 @@ namespace swf
     {
       //  Tag code is high 10 bits
       return (m_TagCodeAndLength & 0xFFC0) >> 6;
+    }
+
+    inline uint32_t size()
+    {
+      return extended() ? 6 : 2;
     }
   private:
     uint16_t m_TagCodeAndLength;
@@ -126,3 +134,5 @@ namespace swf
     uint32_t m_bytes;
   };
 }
+
+#endif
