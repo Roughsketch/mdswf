@@ -1,0 +1,4 @@
+mdswf
+=====
+
+SWF decompressor
