@@ -19,7 +19,6 @@
 namespace swf
 {
   std::vector<uint8_t> decompress(std::string);
-  std::string get_tag_name(uint32_t tag);
 
   struct SWFHeader
   {
@@ -118,7 +117,7 @@ namespace swf
         Tag newtag(m_content, i);
         m_tags.push_back(newtag);
 
-        std::cout << "Tag: " << get_tag_name(newtag.tag()) << std::endl;
+        std::cout << "Tag: " << newtag.tag_name() << std::endl;
         i += newtag.size();
 
       }
