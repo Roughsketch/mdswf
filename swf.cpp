@@ -30,4 +30,43 @@ namespace swf
 
     return contents;
   }
+
+  void SWFFile::write(std::string out)
+  {
+    std::vector<uint8_t> swfdata = m_header->raw();
+
+    for (auto& tag : m_tags)
+    {
+      auto tagdata = tag.raw();
+      std::copy(tagdata.begin(), tagdata.end(), std::back_inserter(swfdata));
+    }
+
+    util::write_file(out, swfdata);
+  }
+
+  void SWFFile::randomize()
+  {
+    std::random_device rd;
+    std::mt19937 random;
+    std::uniform_int_distribution<int> dist(0, 0xFF);
+
+    random.seed(rd());
+
+    for (auto& swftag : m_tags)
+    {
+      if (swftag.tag() != Tags::DefineShape)
+      {
+        continue;
+      }
+
+      auto data = swftag.data();
+
+      for (int i = 20; i < data.size(); i += 50)
+      {
+        data[i] = dist(random);
+      }
+
+      swftag.set_data(data);
+    }
+  }
 }

@@ -10,6 +10,7 @@
 #include <fstream>
 #include <memory>
 #include <map>
+#include <random>
 
 #include "util.h"
 
@@ -40,6 +41,8 @@ namespace swf
       {
         m_framerate = static_cast<float>(m_framerate_fixed >> 8);
       }
+
+      std::copy(file.begin() + offset, file.begin() + offset + size(), std::back_inserter(m_raw));
     }
 
     inline std::string signature()
@@ -77,6 +80,11 @@ namespace swf
       return 12 + m_framesize->length();
     }
 
+    inline std::vector<uint8_t> raw()
+    {
+      return m_raw;
+    }
+
     friend std::ostream& operator<<(std::ostream& os, SWFHeader& header)
     {
       std::cout << "Signature:   " << header.signature() << std::endl;
@@ -96,6 +104,8 @@ namespace swf
     uint16_t m_framerate_fixed;
     float m_framerate;
     uint16_t m_framecount;
+
+    std::vector<uint8_t> m_raw;
   };
 
   class SWFFile
@@ -128,16 +138,14 @@ namespace swf
       return SWFHeader(*m_header);
     }
 
-    inline void write(std::string out)
-    {
-      util::write_file(out, m_content);
-    }
-
     friend std::ostream& operator<<(std::ostream& os, SWFFile& file)
     {
       std::cout << file.header();
       return os;
     }
+
+    void write(std::string out);
+    void randomize();
   private:
     std::vector<uint8_t> m_content;
     std::shared_ptr<SWFHeader> m_header;
